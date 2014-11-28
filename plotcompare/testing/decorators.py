@@ -14,7 +14,7 @@ import unittest
 import nose
 import numpy as np
 
-import matplotlib.tests
+#import matplotlib.tests
 import matplotlib.units
 from matplotlib import cbook
 from matplotlib import ticker
@@ -70,7 +70,7 @@ def _do_cleanup(original_units_registry):
     plt.close('all')
     gc.collect()
 
-    matplotlib.tests.setup()
+    #matplotlib.tests.setup()
 
     matplotlib.units.registry.clear()
     matplotlib.units.registry.update(original_units_registry)
@@ -171,9 +171,9 @@ class ImageComparisonTest(CleanupTest):
                     will_fail = True
                     fail_msg = 'Do not have baseline image %s' % expected_fname
 
-                @knownfailureif(
-                    will_fail, fail_msg,
-                    known_exception_class=ImageComparisonFailure)
+                #@knownfailureif(
+                #    will_fail, fail_msg,
+                #    known_exception_class=ImageComparisonFailure)
                 def do_test():
                     figure = plt.figure(fignum)
 
@@ -298,9 +298,13 @@ def _image_directories(func):
         subdir = os.path.splitext(os.path.split(script_name)[1])[0]
     else:
         mods = module_name.split('.')
-        mods.pop(0) # <- will be the name of the package being tested (in
-                    # most cases "matplotlib")
-        assert mods.pop(0) == 'tests'
+        # find test directory
+        # don't iter over mods, we are modifying mods inside loop
+        for _ in range(len(mods)):
+            if 'tests' not in mods:
+                break
+            else:
+                mods.pop(0)
         subdir = os.path.join(*mods)
 
         import imp
@@ -321,6 +325,7 @@ def _image_directories(func):
 
         mod_file = find_dotted_module(func.__module__)[1]
         basedir = os.path.dirname(mod_file)
+
 
     baseline_dir = os.path.join(basedir, 'baseline_images', subdir)
     result_dir = os.path.abspath(os.path.join('result_images', subdir))
